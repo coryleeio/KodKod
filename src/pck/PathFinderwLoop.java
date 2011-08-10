@@ -211,18 +211,17 @@ public class PathFinderwLoop {
 	@SuppressWarnings("rawtypes")
 	public static String find_loop_path(SubGraph jpx, Integer forcediterations) {
 		try {
-			FileWriter outFile = new FileWriter("./temp");
-			PrintWriter out = new PrintWriter(outFile);
+		//	FileWriter outFile = new FileWriter("./temp");
+		//	PrintWriter out = new PrintWriter(outFile);
 
 			final PathFinderwLoop model = new PathFinderwLoop();							/* Path		Path */
 			final Solver solver = new Solver();
 			final Formula f = model.empty();
-			System.out.println(f);
+		//	System.out.println(f);
 			solver.options().setSolver(SATFactory.DefaultSAT4J);
-			System.out.println(System.currentTimeMillis());
+			//System.out.println(System.currentTimeMillis());
 
 
-// note that found is never changed. this look only ends through the break statement.
 			Integer i = 1;
 			while(!found){
 				
@@ -234,12 +233,12 @@ public class PathFinderwLoop {
 				while(iterSols.hasNext()) {
 					final Solution s = (Solution) iterSols.next();
 					if(s.outcome() == Solution.Outcome.SATISFIABLE || s.outcome() == Solution.Outcome.TRIVIALLY_SATISFIABLE){
-						System.out.print(s);
+					//	System.out.print(s);
 
 
 						String[] temp  = s.toString().split("ref=");
-						System.out.println("");
-						System.out.println("");
+					//	System.out.println("");
+					//	System.out.println("");
 						temp = temp[1].split(", next=");
 						temp = temp[0].split(", ");
 						ArrayList<String> ee = new ArrayList<String>();
@@ -317,7 +316,7 @@ public class PathFinderwLoop {
 
 
 
-						out.print(s);	
+					//	out.print(s);	
 					}
 				}
 
@@ -334,8 +333,8 @@ public class PathFinderwLoop {
 			
 			
 			System.out.println("path == " + fin);
-			out.close();
-			outFile.close();
+		//	out.close();
+		//	outFile.close();
 			
 			
 			
@@ -343,7 +342,6 @@ public class PathFinderwLoop {
 			return fin;
 
 		}	catch (NumberFormatException nfe) {}
-		catch (IOException e) {}
 		return null; // TODO some protection should be added here
 	}
 

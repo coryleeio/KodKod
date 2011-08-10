@@ -187,7 +187,7 @@ public class PathFinder {
 			final Solver solver = new Solver();
 
 			final Formula f = model.empty();
-			System.out.println(f);
+		//	System.out.println(f);
 			solver.options().setSolver(SATFactory.DefaultSAT4J);
 
 
@@ -271,7 +271,7 @@ public class PathFinder {
 			}
 			//outFile.close();
 		//	out.close();
-			System.out.println(fin);
+			System.out.println("path == " + fin);
 			return fin;
 
 		}	catch (NumberFormatException nfe) {System.out.print("EEEK1!");}
