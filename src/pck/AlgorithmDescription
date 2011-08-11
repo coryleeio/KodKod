@@ -1,0 +1,68 @@
+PsuedoCode for solveGraph(graph)
+{
+
+Call loopFinder solver.
+If (that graph contains a loop){ 
+call CreateSubgraphs()
+}
+then:
+SolveAllSubgraphs()
+solvePath()
+for all subgraphs, replace each loop variable in THIS GRAPH's path-string with the path-string of the respective subgraph.
+}//end of PsuedoCode for solveGraph()
+
+
+
+//PseudoCode of SolvePath()
+SolvePath(){
+	for(int i =1; i <= num_nodes; i++){
+		call solver to find all un-found paths of length i
+	}
+format properly and append to path string.
+} // End of PseudoCode of SolvePath()
+
+
+
+
+//Pseudo-code for CreateSubgraphs()
+CreateSubGraphs(){
+build a subgraph from all the nodes and edges interconnecting parts of any loop. Each loop corresponds to one subgraph.
+remove all edges and nodes contained within, or interconnecting any of the nodes found in the loop and the node immediately after the endpoint of the loop.
+
+Add a new node to the mid entitled LOOP+index, where index is an identifier for which loop was replaced.
+Any edge that ended on a start node now ends on it's respective loop variable node.
+Any edge and node that was contained within the loop-set is now moved into a new subgraph. along with the node immediately after the end-node.
+}
+
+
+
+//PsuedoCode for SolveAllSubgraphs(){
+for all Subgraphs, call SolveSubgraph();
+}
+
+
+
+Pseudo-code for SolveSubgraph(){
+	Remove all edges that connect the start-point with the end_loop node
+	if(still contains loops){
+	CreateSubgraphs()
+	SolveAllSubgraphs()
+	}
+	while(path string doesn't contain a loop){
+	i = 1;
+	call solver to find solutions that it doesn't already have in the path string of length i
+	append those solutions to path string
+	i++
+	}
+	replace all variable loops with path-strings found in subgraphs
+	return path-string.
+	
+	
+	
+	
+}
+
+
+
+
+

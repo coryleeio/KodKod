@@ -1,0 +1,2 @@
+solvePath() and SolvePathwLoop() need to have logic added to search their solved pathstrings for the subgraph labels, and replace appropriately.
+CreateSubGraphs() needs to be written.

@@ -396,16 +396,16 @@ public class Graph {
 	/**
 	 * This private method solves all the subgraphs in this graph, by calling solveSubGraph on all of them.
 	 */
-	protected void solveAllSubgraphs(){
+	protected void solveAllSubgraphs(Integer iterations){
 		for(int i = 0; i < subs.size(); i++){
-			subs.get(i).solveSubgraph();
+			subs.get(i).solveSubgraph(iterations);
 		}
 	}
 
 	/**
 	 * this method solves the current graph, and sets it's path string.
 	 */
-	public void solveGraph(){
+	public void solveGraph(Integer iterations){
 		// TODO if loops exist....
 		// TODO remove loops from graph.... and create subgraphs. then solve subgraphs. <-- magic function.
 
@@ -413,7 +413,7 @@ public class Graph {
 
 
 
-		this.solveAllSubgraphs();
+		this.solveAllSubgraphs(iterations);
 		// TODO then solve this graph <using normal methods in the pathfinder.. simply solve graph, and convert solutions into the pathstring>
 		// TODO then replace subgraph labels in path string with subgraph solutions. <this one should be pretty easy>
 		// finally set path string in THIS graph to final solution.
@@ -428,8 +428,12 @@ public class Graph {
 		//uses path string from the subgraphs to generate the pathstring, so make sure you create and solve them first. 
 		// this is intended to only be run on graphs that DO NOT CONTAIN LOOPS. Otherwise, it will take a long time to complete.
 		this.setPath(PathFinder.find_path(this));
+		if(this.getPath() == null){
+			System.out.println("No path found, check your input");
+		}
+		else{
 		System.out.println("path found == " + this.getPath());
-		
+		}
 	}
 
 
@@ -457,18 +461,20 @@ public class Graph {
 	 * @param argc - ignore.
 	 */
 	public static void main(String[] argc){
-		Graph test  = new Graph();
-		Graph test2 = new Graph();
+	    SubGraph test  = new SubGraph("Loop1");
+		//Graph test2 = new Graph();
+		
 		Graph test3 = new Graph();
 		Graph test4 = new Graph();
 		test.readFile("src/graphs/forloop.txt");
-		test.printMe();
-		test2.readFile("src/graphs/parallelloops.txt");
-		test2.printMe();
+		test.solveSubgraph(1);
+	//	test2.readFile("src/graphs/parallelloops.txt");
+	//	test2.printMe();
 		test3.readFile("src/graphs/linearinput.txt");
-		test3.printMe();
+		test3.solveGraph(1);
+		//test3.printMe();
 		test4.readFile("src/graphs/complexgraph.txt");
-		test4.printMe();
+		test4.solveGraph(1);
 		System.out.println("test complete");
 	}
 

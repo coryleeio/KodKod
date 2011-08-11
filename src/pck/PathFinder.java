@@ -179,6 +179,7 @@ public class PathFinder {
 	@SuppressWarnings("rawtypes")
 	public static String find_path(Graph jpx) {
 		try {
+			fin = new String();
 
 		//	FileWriter outFile = new FileWriter("./temp");
 		//	PrintWriter out = new PrintWriter(outFile);
@@ -271,7 +272,7 @@ public class PathFinder {
 			}
 			//outFile.close();
 		//	out.close();
-			System.out.println("path == " + fin);
+		//	System.out.println("path == " + fin);
 			return fin;
 
 		}	catch (NumberFormatException nfe) {System.out.print("EEEK1!");}

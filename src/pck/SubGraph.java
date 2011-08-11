@@ -23,7 +23,7 @@ public class SubGraph extends Graph{
 	 * this method removes the nodes connecting the start_loop(aka start) and the end_loop node(NOT THE FINISH NODE) then solves the graph like normal.
 	 * this allows this normal solve method to check for further inner loops, and then solve them.
 	 */
-	public void solveSubgraph(){
+	public void solveSubgraph(Integer iterations){
 		// TODO remove loop connectors!!!!!!
 		//<<remove the nodes that connect the start node, and the end_loop node. (end loop is a construct that only exists within a subgraph).
 		ArrayList<Pair> begin = this.getBegin();
@@ -48,7 +48,7 @@ public class SubGraph extends Graph{
 		this.createSubGraphs();
 		// now the graphs have been removed, we REPLACE those edges that we removed, and solve the graph.
 
-		this.solveAllSubgraphs();
+		this.solveAllSubgraphs(iterations);
 		for(int i = 0; i < removedbegs.size(); i++){
 			begin.add(removedbegs.get(i));
 			ends.add(removedends.get(i));
@@ -56,7 +56,7 @@ public class SubGraph extends Graph{
 		// now removed edges have been re-added but they are out of order in the arrayList, but it shouldn't matter.
 		// then just solve like normal.
 		// we call solvePathwLoop because this subgraph should now contain exactly ONE loop. the primary outer loop, and possibly an array of subgraphs
-		this.solvePathwLoop();
+		this.solvePathwLoop(iterations);
 	}
 
 
@@ -64,8 +64,14 @@ public class SubGraph extends Graph{
 	// this should ONLY be called on a graph that contains ONE loop... ie a properly treated subgraph.
 	// finds all paths up until the point where the startnode is encountered again.  Then uses this.subgraphs to replace the variables created.
 
-	private void solvePathwLoop(){
-
+	private void solvePathwLoop(Integer iterations){
+		this.setPath(PathFinderwLoop.find_loop_path(this, iterations));
+		if(this.getPath() == null){
+			System.out.println("No path found, check your input");
+		}
+		else{
+		System.out.println("path found == " + this.getPath());
+		}
 
 
 	}

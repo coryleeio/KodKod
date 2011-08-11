@@ -211,6 +211,7 @@ public class PathFinderwLoop {
 	@SuppressWarnings("rawtypes")
 	public static String find_loop_path(SubGraph jpx, Integer forcediterations) {
 		try {
+			fin = new String();
 		//	FileWriter outFile = new FileWriter("./temp");
 		//	PrintWriter out = new PrintWriter(outFile);
 
@@ -332,7 +333,7 @@ public class PathFinderwLoop {
 			
 			
 			
-			System.out.println("path == " + fin);
+		//	System.out.println("path == " + fin);
 		//	out.close();
 		//	outFile.close();
 			
