@@ -409,7 +409,10 @@ public class Graph {
 		// TODO if loops exist....
 		// TODO remove loops from graph.... and create subgraphs. then solve subgraphs. <-- magic function.
 
-		this.createSubGraphs();
+		
+		
+		
+	//	this.createSubGraphs();
 
 
 
@@ -428,6 +431,12 @@ public class Graph {
 		//uses path string from the subgraphs to generate the pathstring, so make sure you create and solve them first. 
 		// this is intended to only be run on graphs that DO NOT CONTAIN LOOPS. Otherwise, it will take a long time to complete.
 		this.setPath(PathFinder.find_path(this));
+		for(int i = 0; i < subs.size(); i++){
+		this.setPath( this.getPath().replaceAll(subs.get(i).getLabel(), subs.get(i).getPath()) );
+		}
+		
+		
+		
 		if(this.getPath() == null){
 			System.out.println("No path found, check your input");
 		}
@@ -452,8 +461,183 @@ public class Graph {
 		// TODO all edges that point to the start node now point to the LOOP node.
 		// TODO all edges that begin on the node AFTER the end node now begin with the LOOP node.
 
+		Integer LoopCounter = 0;
+		String tempx = new String();
+		String nodeAfter = new String();
+		String inp = LoopFinder.find_loops(this);
+		
+		
+		
 		//since these are saved locally it's okay to re-use the indexes for each graph and it's respective subgraphs.
+		
+		// if this statement evaluates to true we have a graph that starts on the start loop node, an edge must be added in order to find correct results.
+		if(inp.contains("start_loop=[]") && !inp.contains("end_loop=[]") && !inp.contains("loop_set=[]")){
+			// add an edge and a node to the graph that comes before the start node (the graph found by this logic starts on the start-node
+			System.out.println("found an ugly graph.");
+			this.getNodes().add("NodeX");
+			this.getEdge().add("EdgeX");
+			this.getBegin().add(new Pair("EdgeX" , "NodeX"));
+			this.getEnd().add(new Pair("EdgeX", this.getStartPt()));
+			System.out.println("GRAPH HAS BEEN MODIFIED // THIS IS THE RESULT --- ");
+			this.printMe();
+			
+			
+		}
+		
+		
+		
+		
+		
+		else if(inp.contains("start_loop=[]") && inp.contains("end_loop=[]") && inp.contains("loop_set=[]")){
+			// we're done here, no loops are detected.
+			System.out.println("no loops detected, returning.");
+			return;
+		}
+		// now all graphs should give correct output if we find loops.
+		// now refresh the string.
+		System.out.println("HERPHERP");
+		inp = LoopFinder.find_loops(this);
+		System.out.println(inp);
+		// temp is a list of all the start nodes at this point.
+		String temp = inp.split("start_loop=")[1].split("], end_loop=")[0];
+		//if there is only one start node.
+		if(!temp.contains(",")){
+			String startNode = temp.substring(2, temp.length() - 1).trim();
 
+			temp = inp.split("end_loop=")[1].split(", loop_set=")[0];
+			String endNode = temp.substring(2, temp.length() - 2).trim();
+
+			temp = inp.split("loop_set=")[1].split(", corresp=")[0];
+			temp = temp.substring(1, temp.length() - 1);
+			String[] temp2 = new String[20];
+			temp2 = temp.split(", ");
+			ArrayList<String> NodeList = new ArrayList<String>();
+			for(int i= 0; i < temp2.length; i++){
+				NodeList.add(temp2[i].substring(1, temp2[i].length() - 1));
+				
+			}
+			
+		
+			ArrayList<String> CheckEdges = new ArrayList<String>();
+			for(int i = 0; i < this.getBegin().size(); i++){
+				System.out.println("if "+ this.getBegin().get(i).getY()+ "equals " + startNode);
+				if( this.getBegin().get(i).getY().trim().equalsIgnoreCase(startNode.trim() )){
+					System.out.println("added one");
+					CheckEdges.add( this.getBegin().get(i).getX());
+					
+				}
+			}
+			System.out.println("tempx = " + tempx);
+			for(int i = 0; i < this.getEnd().size(); i++){
+				if(CheckEdges.contains( this.getEnd().get(i).getX() ) && !(NodeList.contains(  this.getEnd().get(i).getY()))){
+					nodeAfter = this.getEnd().get(i).getY();
+				}
+			}
+			System.out.println("startnode = " + startNode);
+			System.out.println("endnode = " + endNode);
+			System.out.println("nodaf = " + nodeAfter);
+			NodeList.add(nodeAfter);
+			
+			
+			subs.add(new SubGraph("Loop1"));
+			
+			
+			
+			ArrayList<String> newnod = (ArrayList<String>) NodeList.clone();
+			ArrayList<Pair> rembeg = new ArrayList<Pair>();
+			ArrayList<Pair> remend = new ArrayList<Pair>();
+			
+			ArrayList<Pair> templist = this.getBegin();
+			ArrayList<Pair> templist2 = this.getEnd();
+			
+			this.getNodes().removeAll(NodeList);
+			
+			
+			for(int i = 0; i < this.getBegin().size(); i++){
+				if(NodeList.contains(this.getBegin().get(i).getY())){
+					System.out.println("Evaluated to true on "+ this.getBegin().get(i).getY());
+					rembeg.add(this.getBegin().get(i));
+					this.getBegin().remove(i);
+				}
+				
+			}
+			
+			for(int i = 0; i < this.getEnd().size(); i++){
+				if(NodeList.contains(this.getEnd().get(i).getY())){
+					remend.add(this.getEnd().get(i));
+					this.getEnd().remove(i);
+				}
+			}
+			
+			
+			
+		/*	this.getNodes().add("Loop1");
+			for(int i = 0; i < this.getBegin().size(); i++){
+				if( templist.get(i).getY().equalsIgnoreCase(nodeAfter)){
+					templist.get(i).setPair(templist.get(i).getX(), "Loop1");
+				}
+			}
+			templist2 = this.getEnd();
+			for(int i = 0; i < this.getEnd().size(); i++){
+				if( templist2.get(i).getY().equalsIgnoreCase(startNode)){
+					templist2.get(i).setPair(templist.get(i).getX(), "Loop1");
+				}
+			}
+			*/
+			
+			for(int i = 0; i < rembeg.size(); i++){
+				System.out.println( rembeg.get(i).getX() + " , " + rembeg.get(i).getY());
+			}
+			for(int i = 0; i < remend.size(); i++){
+				System.out.println( remend.get(i).getX() + " , " + remend.get(i).getY());
+			}
+			
+			
+			System.out.println("NodeLIST:");
+			for(int i = 0; i < NodeList.size(); i++){
+				System.out.println(NodeList.get(i));
+			}
+			
+			
+			
+			
+			
+			
+			
+			System.out.println("begs:");
+			for(int i = 0; i < begin.size(); i++){
+			System.out.println(this.getBegin().get(i).getX() + " ," + this.getBegin().get(i).getY());
+			}
+			System.out.println("ends:");
+			for(int i = 0; i < end.size(); i++){
+			System.out.println(this.getEnd().get(i).getX() + " ," + this.getEnd().get(i).getY());
+			}
+			
+			
+			
+			
+			
+			
+
+			
+			
+			
+			
+			
+			
+		}
+		else{
+			// here we deal with multiple outer loops in the same graph.
+			
+			
+		}
+		
+		
+		
+
+		
+		
+		
 	}
 
 	/**
@@ -466,15 +650,16 @@ public class Graph {
 		
 		Graph test3 = new Graph();
 		Graph test4 = new Graph();
-		test.readFile("src/graphs/forloop.txt");
+		test.readFile("src/graphs/nestedloop.txt");
+		test.printMe();
 		test.solveSubgraph(1);
 	//	test2.readFile("src/graphs/parallelloops.txt");
 	//	test2.printMe();
-		test3.readFile("src/graphs/linearinput.txt");
-		test3.solveGraph(1);
+		//test3.readFile("src/graphs/linearinput.txt");
+	//	test3.solveGraph(1);
 		//test3.printMe();
-		test4.readFile("src/graphs/complexgraph.txt");
-		test4.solveGraph(1);
+	//	test4.readFile("src/graphs/complexgraph.txt");
+	//	test4.solveGraph(1);
 		System.out.println("test complete");
 	}
 

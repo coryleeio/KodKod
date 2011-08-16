@@ -24,7 +24,7 @@ public class LoopFinder {
 
 	private final Relation Edge, begin, end, corresp;
 
-	private final Relation start_loop, end_loop, loop_set, node_after;
+	private final Relation start_loop, end_loop, loop_set;
 
 	public LoopFinder() {														/* Path */
 		Node = Relation.unary("Node");
@@ -32,7 +32,6 @@ public class LoopFinder {
 		start_loop = Relation.unary("start_loop");
 		end_loop = Relation.unary("end_loop");
 		loop_set = Relation.unary("loop_set");
-		node_after = Relation.unary("node_after");
 
 
 		begin = Relation.binary("begin");
@@ -156,6 +155,15 @@ public class LoopFinder {
 		final Formula f34 = x.product(n).in(corresp);
 		final Formula f35 = f34.iff(f33.and(f32).and(f31));
 		final Formula f36 = f35.forAll(n.oneOf(Node).and(x.oneOf(Node)));
+/*		
+		final Formula f200 = x.in(NodeAfter);
+		final Formula f201 = x.difference(start_loop).in(node_after);
+		final Formula f202 = f201.iff(f200);
+		final Formula f203 = f202.forAll(x.oneOf(Node).and(n.oneOf(end_loop)));
+	*/	
+		
+		
+		
 
 		/*
         final Formula f37 = n.in(end_loop);
@@ -282,7 +290,6 @@ public class LoopFinder {
 		b.bound(start_loop, f.range(f.tuple(jpx.getNodes().get(0)), f.tuple( jpx.getNodes().get(jpx.getNodes().size()-1))));
 		b.bound(end_loop, f.range(f.tuple(jpx.getNodes().get(0)), f.tuple( jpx.getNodes().get(jpx.getNodes().size()-1))));
 		b.bound(loop_set, f.range(f.tuple(jpx.getNodes().get(0)), f.tuple( jpx.getNodes().get(jpx.getNodes().size()-1))));
-		b.bound(node_after, f.range(f.tuple(jpx.getNodes().get(0)), f.tuple( jpx.getNodes().get(jpx.getNodes().size()-1))));
 
 		b.bound(corresp, b.upperBound(start_loop).product(b.upperBound(end_loop)));
 
@@ -314,7 +321,7 @@ public class LoopFinder {
 
 
 	@SuppressWarnings("rawtypes")
-	public static void find_loops(Graph jpx){
+	public static String find_loops(Graph jpx){
 		try{
 			FileWriter outFile = new FileWriter("./temp");
 			PrintWriter out = new PrintWriter(outFile);
@@ -323,31 +330,30 @@ public class LoopFinder {
 			final Solver solver = new Solver();
 			final Bounds b = model.buildGraph(jpx);
 			final Formula f = model.empty();
-			System.out.println(f);
+			
 			solver.options().setSolver(SATFactory.DefaultSAT4J);
-			System.out.println(System.currentTimeMillis());
 			Iterator iterSols = solver.solveAll(f , b);
-			System.out.println(System.currentTimeMillis());
-			while(iterSols.hasNext()) {
+			
 				final Solution s = (Solution) iterSols.next();
 				if(s.outcome() == Solution.Outcome.SATISFIABLE || s.outcome() == Solution.Outcome.TRIVIALLY_SATISFIABLE){
 					out.print(s);
 				}
-			}
+				
 
 
 
 
 
 			//output goes here.
-			//out.print(" ///// ");			
-
-			outFile.close();
+			//out.print(" ///// ");	
 			out.close();
+			outFile.close();
+			return s.toString();
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		return null;
 
 	}
 
@@ -355,6 +361,7 @@ public class LoopFinder {
 	public static void main(String[] argc){
 		Graph jpx = new Graph();
 		jpx.readFile("src/graphs/forloop.txt");
+		//jpx.readFile("src/graphs/forloop.txt");
 		LoopFinder.find_loops(jpx);
 	}
 
