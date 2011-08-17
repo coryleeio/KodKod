@@ -360,7 +360,7 @@ public class LoopFinder {
 
 	public static void main(String[] argc){
 		Graph jpx = new Graph();
-		jpx.readFile("src/graphs/forloop.txt");
+		jpx.readFile("src/graphs/parallelloops.txt");
 		//jpx.readFile("src/graphs/forloop.txt");
 		LoopFinder.find_loops(jpx);
 	}

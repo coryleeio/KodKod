@@ -397,6 +397,9 @@ public class Graph {
 	 * This private method solves all the subgraphs in this graph, by calling solveSubGraph on all of them.
 	 */
 	protected void solveAllSubgraphs(Integer iterations){
+		if(subs.size() == 0){
+			return;
+		}
 		for(int i = 0; i < subs.size(); i++){
 			subs.get(i).solveSubgraph(iterations);
 		}
@@ -412,10 +415,10 @@ public class Graph {
 		
 		
 		
-	//	this.createSubGraphs();
+		this.createSubGraphs();
 
 
-
+System.out.println("CALLING DR. SOLVER");
 		this.solveAllSubgraphs(iterations);
 		// TODO then solve this graph <using normal methods in the pathfinder.. simply solve graph, and convert solutions into the pathstring>
 		// TODO then replace subgraph labels in path string with subgraph solutions. <this one should be pretty easy>
@@ -460,7 +463,7 @@ public class Graph {
 		// TODO this function removes all the loops from a graph and replaces them with singular nodes. named LOOP[INDEX] eg LOOP1
 		// TODO all edges that point to the start node now point to the LOOP node.
 		// TODO all edges that begin on the node AFTER the end node now begin with the LOOP node.
-
+		boolean flag = false;
 		Integer LoopCounter = 0;
 		String tempx = new String();
 		String nodeAfter = new String();
@@ -473,6 +476,7 @@ public class Graph {
 		// if this statement evaluates to true we have a graph that starts on the start loop node, an edge must be added in order to find correct results.
 		if(inp.contains("start_loop=[]") && !inp.contains("end_loop=[]") && !inp.contains("loop_set=[]")){
 			// add an edge and a node to the graph that comes before the start node (the graph found by this logic starts on the start-node
+			flag = true;
 			System.out.println("found an ugly graph.");
 			this.getNodes().add("NodeX");
 			this.getEdge().add("EdgeX");
@@ -497,6 +501,12 @@ public class Graph {
 		// now refresh the string.
 		System.out.println("HERPHERP");
 		inp = LoopFinder.find_loops(this);
+		if(flag == true){
+			this.getNodes().remove("NodeX");
+			this.getEdge().remove("EdgeX");
+			this.getBegin().remove(new Pair("EdgeX" , "NodeX"));
+			this.getEnd().remove(new Pair("EdgeX", this.getStartPt()));
+		}
 		System.out.println(inp);
 		// temp is a list of all the start nodes at this point.
 		String temp = inp.split("start_loop=")[1].split("], end_loop=")[0];
@@ -517,7 +527,7 @@ public class Graph {
 				
 			}
 			
-		
+			ArrayList<String> CheckNodes = new ArrayList<String>();
 			ArrayList<String> CheckEdges = new ArrayList<String>();
 			for(int i = 0; i < this.getBegin().size(); i++){
 				System.out.println("if "+ this.getBegin().get(i).getY()+ "equals " + startNode);
@@ -539,7 +549,7 @@ public class Graph {
 			NodeList.add(nodeAfter);
 			
 			
-			subs.add(new SubGraph("Loop1"));
+			
 			
 			
 			
@@ -552,22 +562,26 @@ public class Graph {
 			
 			this.getNodes().removeAll(NodeList);
 			
+		
 			
-			for(int i = 0; i < this.getBegin().size(); i++){
-				if(NodeList.contains(this.getBegin().get(i).getY())){
-					System.out.println("Evaluated to true on "+ this.getBegin().get(i).getY());
-					rembeg.add(this.getBegin().get(i));
-					this.getBegin().remove(i);
+			// nodes that point to the start node, but who dont START from a node inside the loopset, now point to loop variable.
+			
+			for(int i = 0; i < templist2.size();i++){
+				if(templist2.get(i).getY().equalsIgnoreCase(startNode)){
+					if(!NodeList.contains( templist.get(Graph.indfromX(templist, templist2.get(i).getX())).getY())){
+					templist2.get(i).setPair(templist2.get(i).getX(), "Loop1");
+					}
 				}
+			}
+
+			for(int i = 0; i < templist.size();i++){
+				if(this.getBegin().get(i).getY().equalsIgnoreCase(nodeAfter)){
+					templist.get(i).setPair(templist.get(i).getX(), "Loop1");
+				}
+			}
 				
-			}
+				
 			
-			for(int i = 0; i < this.getEnd().size(); i++){
-				if(NodeList.contains(this.getEnd().get(i).getY())){
-					remend.add(this.getEnd().get(i));
-					this.getEnd().remove(i);
-				}
-			}
 			
 			
 			
@@ -584,25 +598,65 @@ public class Graph {
 				}
 			}
 			*/
-			
+		/*	
 			for(int i = 0; i < rembeg.size(); i++){
 				System.out.println( rembeg.get(i).getX() + " , " + rembeg.get(i).getY());
 			}
 			for(int i = 0; i < remend.size(); i++){
 				System.out.println( remend.get(i).getX() + " , " + remend.get(i).getY());
 			}
-			
-			
+			*/
+	/*		
 			System.out.println("NodeLIST:");
 			for(int i = 0; i < NodeList.size(); i++){
 				System.out.println(NodeList.get(i));
 			}
+		*/	
 			
 			
 			
+CheckEdges.clear();
+
+			
+			
+			for(int i = 0; i < templist.size(); i ++){
+				if(NodeList.contains( templist.get(i).getY() )){
+					CheckEdges.add(templist.get(i).getX()	);
+				
+				}
+			}
+			for(int i = 0; i < templist2.size(); i++){
+				if(NodeList.contains( templist2.get(i).getY())){
+					if(!CheckEdges.contains(templist2.get(i).getX().trim())){
+						CheckEdges.add(templist2.get(i).getX());
+					}
+				}
+				
+			}
+			
+
+			for(int i = 0; i < CheckEdges.size(); i++){
+				int indexbeg = Graph.indfromX(this.getBegin(), CheckEdges.get(i));
+				int indexend = Graph.indfromX(this.getEnd(), CheckEdges.get(i));
+				
+				rembeg.add(this.getBegin().get(indexbeg));
+				remend.add(this.getEnd().get(indexend));
+				this.getBegin().remove(indexbeg	);
+				this.getEnd().remove(indexend);
+			}
 			
 			
 			
+			for(int i = 0; i < rembeg.size(); i++){
+				if(!CheckNodes.contains(rembeg.get(i).getY())){
+					CheckNodes.add(rembeg.get(i).getY());
+				}
+			}
+			for(int i = 0; i < remend.size(); i++){
+				if(!CheckNodes.contains(remend.get(i).getY())){
+					CheckNodes.add(remend.get(i).getY());
+				}
+			}
 			
 			System.out.println("begs:");
 			for(int i = 0; i < begin.size(); i++){
@@ -613,12 +667,27 @@ public class Graph {
 			System.out.println(this.getEnd().get(i).getX() + " ," + this.getEnd().get(i).getY());
 			}
 			
+			subs.add(new SubGraph("Loop1"));
 			
 			
-			
-			
+			subs.get(0).setNodes(CheckNodes);
+			this.getNodes().add("Loop1");
+			subs.get(0).setEdge(CheckEdges);
+			subs.get(0).setBegin(rembeg);
+			subs.get(0).setEnd(remend);
+			subs.get(0).setStartPt(startNode);
+			subs.get(0).setEndPt(nodeAfter);
 			
 
+			for(int i = 0; i < this.getEdge().size(); i++){
+				if(CheckEdges.contains(this.getEdge().get(i).trim())){
+					this.getEdge().remove(i);
+					i--;
+				}
+			}
+			
+			this.printMe();
+			subs.get(0).printMe();
 			
 			
 			
@@ -639,6 +708,21 @@ public class Graph {
 		
 		
 	}
+	
+	
+	
+	
+	public static int indfromX(ArrayList<Pair> inp, String X){
+		for(int i = 0; i < inp.size();i++){
+			if(inp.get(i).getX().equalsIgnoreCase(X)){
+				return i;
+			}
+			
+		}
+		return -1;
+		
+		
+	}
 
 	/**
 	 * short test for the graph.java class.
@@ -646,14 +730,15 @@ public class Graph {
 	 */
 	public static void main(String[] argc){
 	    SubGraph test  = new SubGraph("Loop1");
+	    
 		//Graph test2 = new Graph();
-		
+	//	test2.readFile("src/graphs/parallelloops.txt");
 		Graph test3 = new Graph();
 		Graph test4 = new Graph();
 		test.readFile("src/graphs/nestedloop.txt");
 		test.printMe();
-		test.solveSubgraph(1);
-	//	test2.readFile("src/graphs/parallelloops.txt");
+		test.solveGraph(1);
+
 	//	test2.printMe();
 		//test3.readFile("src/graphs/linearinput.txt");
 	//	test3.solveGraph(1);
