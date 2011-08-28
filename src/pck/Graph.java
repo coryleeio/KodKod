@@ -397,10 +397,13 @@ public class Graph {
 	 * This private method solves all the subgraphs in this graph, by calling solveSubGraph on all of them.
 	 */
 	protected void solveAllSubgraphs(Integer iterations){
+		System.out.println("SolveAllSubgraphs();");
 		if(subs.size() == 0){
+			System.out.println("zero subgraphs here, so we're returning");
 			return;
 		}
 		for(int i = 0; i < subs.size(); i++){
+			System.out.println("Attempting to solve subgraph " + i);
 			subs.get(i).solveSubgraph(iterations);
 		}
 	}
@@ -412,7 +415,7 @@ public class Graph {
 		// TODO if loops exist....
 		// TODO remove loops from graph.... and create subgraphs. then solve subgraphs. <-- magic function.
 
-		
+		System.out.println("solvegraph called");
 		
 		
 		this.createSubGraphs();
@@ -463,18 +466,20 @@ System.out.println("CALLING DR. SOLVER");
 		// TODO this function removes all the loops from a graph and replaces them with singular nodes. named LOOP[INDEX] eg LOOP1
 		// TODO all edges that point to the start node now point to the LOOP node.
 		// TODO all edges that begin on the node AFTER the end node now begin with the LOOP node.
+		System.out.println("in create subgraphs");
 		boolean flag = false;
 		Integer LoopCounter = 0;
 		String tempx = new String();
 		String nodeAfter = new String();
 		String inp = LoopFinder.find_loops(this);
+		String endloop = new String();
 		
 		
 		
 		//since these are saved locally it's okay to re-use the indexes for each graph and it's respective subgraphs.
 		
 		// if this statement evaluates to true we have a graph that starts on the start loop node, an edge must be added in order to find correct results.
-		if(inp.contains("start_loop=[]") && !inp.contains("end_loop=[]") && !inp.contains("loop_set=[]")){
+		if(inp.contains("start_loop=[]") && inp.contains("end_loop=[]") && !inp.contains("loop_set=[]")){
 			// add an edge and a node to the graph that comes before the start node (the graph found by this logic starts on the start-node
 			flag = true;
 			System.out.println("found an ugly graph.");
@@ -494,24 +499,36 @@ System.out.println("CALLING DR. SOLVER");
 		
 		else if(inp.contains("start_loop=[]") && inp.contains("end_loop=[]") && inp.contains("loop_set=[]")){
 			// we're done here, no loops are detected.
-			System.out.println("no loops detected, returning.");
+			System.out.println("no more loops detected, folding up.");
 			return;
 		}
 		// now all graphs should give correct output if we find loops.
 		// now refresh the string.
-		System.out.println("HERPHERP");
+		System.out.println("All graphs have been normalized at this point... and we're going to search for loops.");
 		inp = LoopFinder.find_loops(this);
-		if(flag == true){
-			this.getNodes().remove("NodeX");
-			this.getEdge().remove("EdgeX");
-			this.getBegin().remove(new Pair("EdgeX" , "NodeX"));
-			this.getEnd().remove(new Pair("EdgeX", this.getStartPt()));
-		}
+		System.out.println("resultant string from loop finder looks like...");
 		System.out.println(inp);
+		if(flag == true){
+			System.out.println("Flag evaluated to true, so we're removing the NodeX pairs, here is the graph before...");
+			this.printMe();
+			this.getNodes().remove(this.getNodes().size() - 1);
+			this.getEdge().remove(this.getEdge().size() - 1);
+			this.getBegin().remove(this.getBegin().size() - 1);
+			this.getEnd().remove(this.getEnd().size() - 1);
+			System.out.println("this is the graph after...");
+			this.printMe();
+		}
+
 		// temp is a list of all the start nodes at this point.
+		if(inp.contains("UNSATISFIABLE")){
+			System.out.println("No more loops to be found... returning.");
+		return;
+		}
 		String temp = inp.split("start_loop=")[1].split("], end_loop=")[0];
 		//if there is only one start node.
+		
 		if(!temp.contains(",")){
+			System.out.println("We've decided at this point there is only one loop in said graph.");
 			String startNode = temp.substring(2, temp.length() - 1).trim();
 
 			temp = inp.split("end_loop=")[1].split(", loop_set=")[0];
@@ -677,6 +694,8 @@ CheckEdges.clear();
 			subs.get(0).setEnd(remend);
 			subs.get(0).setStartPt(startNode);
 			subs.get(0).setEndPt(nodeAfter);
+			subs.get(0).setEnd_loop(endNode);
+			
 			
 
 			for(int i = 0; i < this.getEdge().size(); i++){
@@ -686,9 +705,15 @@ CheckEdges.clear();
 				}
 			}
 			
-			this.printMe();
-			subs.get(0).printMe();
 			
+			
+			System.out.println("at the end of createSubgraphs... Here's what we got.");
+			System.out.println("graph:");
+			this.printMe();
+			for(int i  = 0; i < subs.size(); i++){
+				System.out.println("Sub index " + i + "is below: ");
+				subs.get(i).printMe();
+			}
 			
 			
 			
@@ -697,7 +722,7 @@ CheckEdges.clear();
 		}
 		else{
 			// here we deal with multiple outer loops in the same graph.
-			
+			System.out.println("We've decided at this point there is MORE THAN ONE loop in the graph.");
 			
 		}
 		
@@ -736,8 +761,11 @@ CheckEdges.clear();
 		Graph test3 = new Graph();
 		Graph test4 = new Graph();
 		test.readFile("src/graphs/nestedloop.txt");
+		System.out.println("Starting with the following graph...");
 		test.printMe();
 		test.solveGraph(1);
+		System.out.println("finally done with solve graph... solution is = ");
+		System.out.println( test.getPath()  );
 
 	//	test2.printMe();
 		//test3.readFile("src/graphs/linearinput.txt");

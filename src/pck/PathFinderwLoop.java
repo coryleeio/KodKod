@@ -225,6 +225,7 @@ public class PathFinderwLoop {
 
 			Integer i = 1;
 			while(!found){
+				System.out.println("in the while loop in evil pathfinderwloop");
 				
 
 
@@ -324,14 +325,17 @@ public class PathFinderwLoop {
 
 				i++;
 			}
+			found = false; // necessarry for static variable.
 			
 			
-			
-			
+			System.out.println("Determining Fin...");
+			System.out.println("fin = " + fin);
+			String lolz = jpx.StartPt;
+			String morelulz = fin.substring(1);
 			
 			fin = "(" + jpx.StartPt + "|[" +fin.substring(1) + "])";
 			
-			
+			System.out.println("Fin has been determined...");
 			
 		//	System.out.println("path == " + fin);
 		//	out.close();

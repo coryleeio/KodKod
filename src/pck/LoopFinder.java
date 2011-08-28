@@ -90,15 +90,21 @@ public class LoopFinder {
 		final Formula f19 = n.in(start_loop);
 		final Formula f20 = (f18.and(f17)  ).iff(f19);
 		final Formula f21 = f20.forAll((n.oneOf(Node)));
-
-
-		final Formula f100 = n.in(reachableFromN);
+/*
+		final Formula f100 = st.in(nextNodeN);
+		final Formula f101 = n.in(end_loop);
+		final Formula f102 = n.in(loop_set);
+		final Formula f103 = f101.iff(f102.and(f100)	);
+		final Formula f104 = f103.forAll(n.oneOf(Node).and(st.oneOf(start_loop)));
+	*/	
+		// CURRENT WORKING END SOLUTION
+	/*	final Formula f100 = n.in(reachableFromN);
 		final Formula f101 = (NodeAfter.in(backreachableFromN)).not();
 		final Formula f105 = n.in(start_loop).not();
 		final Formula f102 = n.in(end_loop);
 		final Formula f103 = (f100.and(f101).and(f105)).iff(f102);
 		final Formula f104 = f103.forAll((n.oneOf(Node)));
-
+*/
 
 		// SCHILLER's END SOLUTION
 		/*  final Formula f22 = x.in(nextNodeN);
@@ -151,9 +157,10 @@ public class LoopFinder {
 
 		final Formula f31 = x.in(start_loop);
 		final Formula f32 = n.in(end_loop);
+		final Formula f3x = n.in(loop_set);
 		final Formula f33 = x.in(nextNodeN);
 		final Formula f34 = x.product(n).in(corresp);
-		final Formula f35 = f34.iff(f33.and(f32).and(f31));
+		final Formula f35 = f34.iff(f33.and(f32).and(f31).and(f3x));
 		final Formula f36 = f35.forAll(n.oneOf(Node).and(x.oneOf(Node)));
 /*		
 		final Formula f200 = x.in(NodeAfter);
@@ -246,7 +253,7 @@ public class LoopFinder {
 
 
 
-		return f5.and(f21).and(f30).and(f36).and(f104);
+		return f5.and(f21).and(f30).and(f36);
 
 		//and f26
 		//.and(f21).and(f27).and(f31);
@@ -360,7 +367,7 @@ public class LoopFinder {
 
 	public static void main(String[] argc){
 		Graph jpx = new Graph();
-		jpx.readFile("src/graphs/parallelloops.txt");
+		jpx.readFile("src/graphs/nestedloop.txt");
 		//jpx.readFile("src/graphs/forloop.txt");
 		LoopFinder.find_loops(jpx);
 	}

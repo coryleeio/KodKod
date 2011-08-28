@@ -24,23 +24,41 @@ public class SubGraph extends Graph{
 	 * this allows this normal solve method to check for further inner loops, and then solve them.
 	 */
 	public void solveSubgraph(Integer iterations){
+		System.out.println("IN SOLVE SUBGRAPH");
 		// TODO remove loop connectors!!!!!!
 		//<<remove the nodes that connect the start node, and the end_loop node. (end loop is a construct that only exists within a subgraph).
-		ArrayList<Pair> begin = this.getBegin();
-		ArrayList<Pair> ends  = this.getEnd();
-
-		// this block removes edges that go between start_loop and end_loop
-		for(int i = 0; i < begin.size(); i++){
-			if(   (begin.get(i).getY() == this.getStartPt()) && (ends.get(i).getY() == this.getEnd_loop()  )  || (( begin.get(i).getY() == this.getEnd_loop()) && (ends.get(i).getY() == this.getStartPt())))  {
-				removedbegs.add(begin.get(i) );
-				removedends.add(ends.get(i));
-				begin.remove(i);
-				ends.remove(i);
+		ArrayList<String> remark = new ArrayList<String>();
+		
+		for(int i = 0; i < this.getBegin().size(); i++){
+			if(this.getBegin().get(i).getY().equalsIgnoreCase(this.getEnd_loop())){
+				System.out.println("yes to 1");
+				if(this.getEnd().get(indfromX(this.getEnd(), this.getBegin().get(i).getX())).getY().equalsIgnoreCase(this.getStartPt())){
+					System.out.println("yes to 2, now actually removing " + this.getBegin().get(i).getX());
+					remark.add(this.getBegin().get(i).getX());
+					removedbegs.add(this.getBegin().get(i));
+					removedends.add(this.getEnd().get(this.indfromX(this.getEnd(), this.getBegin().get(i).getX())));
+					this.getEnd().remove(this.indfromX(this.getEnd(), this.getBegin().get(i).getX()));
+					this.getBegin().remove(i);
+					i--;
+				}
 			}
 		}
+		
+		// remove all the edges that were removed, remark is our array for later replacing them.
+		this.getEdge().removeAll(remark);
+		
+		
+		
+		
+		
 
-		this.setBegin(begin);
-		this.setEnd(ends);
+		// this block removes edges that go between start_loop and end_loop
+
+		System.out.println("we have finished removing edges.... here is the graph...");
+		this.printMe();
+		System.out.println("finished printing graph... calling createSubGraphs()")	;
+
+		
 
 
 		// at this point all edges connecting the begin_loop and end_loop nodes has been successfully removed.
@@ -49,14 +67,22 @@ public class SubGraph extends Graph{
 		// now the graphs have been removed, we REPLACE those edges that we removed, and solve the graph.
 
 		this.solveAllSubgraphs(iterations);
+		
+		this.getEdge().addAll(remark);
+		
 		for(int i = 0; i < removedbegs.size(); i++){
-			begin.add(removedbegs.get(i));
-			ends.add(removedends.get(i));
+			this.getBegin().add(removedbegs.get(i));
+			this.getEnd().add(removedends.get(i));
 		}
+		
+		System.out.println("We've finished readding the edges, here is the graph.");
+		this.printMe();
 		// now removed edges have been re-added but they are out of order in the arrayList, but it shouldn't matter.
 		// then just solve like normal.
 		// we call solvePathwLoop because this subgraph should now contain exactly ONE loop. the primary outer loop, and possibly an array of subgraphs
+		System.out.println("Calling solvepathwloop");
 		this.solvePathwLoop(iterations);
+		System.out.println("finished with solvepathwloop...");
 	}
 
 
@@ -72,6 +98,10 @@ public class SubGraph extends Graph{
 		else{
 		System.out.println("path found == " + this.getPath());
 		}
+		
+		for(int i = 0; i < this.getSubs().size(); i++){
+			this.setPath( this.getPath().replaceAll(this.getSubs().get(i).getLabel(), this.getSubs().get(i).getPath()) );
+			}
 
 
 	}
