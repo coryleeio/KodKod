@@ -1,4 +1,4 @@
-package pck;
+package model;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -760,7 +760,7 @@ CheckEdges.clear();
 	//	test2.readFile("src/graphs/parallelloops.txt");
 		Graph test3 = new Graph();
 		Graph test4 = new Graph();
-		test.readFile("src/graphs/nestedloop.txt");
+		test.readFile("src/graphs/parallelloops.txt");
 		System.out.println("Starting with the following graph...");
 		test.printMe();
 		test.solveGraph(1);

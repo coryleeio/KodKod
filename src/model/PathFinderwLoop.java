@@ -1,9 +1,12 @@
-package pck;
+package model;
 /*
  * 
- * This is the path finder, it should only ever be run on the main graph. After the main graph has been processed it will contain no loops, therefore the maximum length of the path
- * is equal to the number of edges in the graph.
- * TODO strip out the loop locating functionality.
+ * This is the path with loop finder... its purpose is to iteratively find a path by iteratively increasing the 
+ * bounds until a path that re-reaches the start-node is found. This is only meant to be run on subgraphs(loops)
+ * whos loops have already been consolidated into further subgraphs. ie. there should only be one loop.
+ * TODO add iterative functionality.
+ * TODO strip out the loop locating functionality, we will already know where it is at this point, it could even be loaded from graph class instead of determined. No reason to do extra work.
+ * 
  */
 import java.io.FileWriter;
 import java.io.IOException;
@@ -18,17 +21,17 @@ import kodkod.instance.*;
 import kodkod.engine.*;
 import kodkod.engine.satlab.SATFactory;
 
-public class PathFinder {
+public class PathFinderwLoop {
 
 	private final Relation Node, Start, Finish;
 
 	private final Relation Edge, begin, end;
 
 	private final Relation Visit, ref, next;
-	
-	private static String fin = new String();
+	private static boolean found = false;
+	static String fin = new String();
 
-	public PathFinder() {														/* Path */
+	public PathFinderwLoop() {														/* Path */
 		Node = Relation.unary("Node");
 		Edge = Relation.unary("Edge");
 		Visit = Relation.unary("Visit");
@@ -38,8 +41,6 @@ public class PathFinder {
 		end = Relation.binary("end");
 		ref = Relation.binary("ref");
 		next = Relation.binary("next");
-
-
 		Start = Relation.unary("Start");
 		Finish = Relation.unary("Finish");
 	}
@@ -92,6 +93,27 @@ public class PathFinder {
 		final Formula f16 = f15.forSome(v.oneOf(Visit)).forAll(w.oneOf(Visit));
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 		return f5.and(f8).and(f12).and(f16);
 
 		//and f26
@@ -102,7 +124,7 @@ public class PathFinder {
 		return declarations().and(facts());
 	}
 	/* this is the old bounds function that was provided. */ 
-	public final Bounds buildpathGraph(Graph jpx, Integer bound) {
+	public final Bounds buildloopGraph(Graph jpx, Integer bound) {
 
 
 
@@ -175,37 +197,50 @@ public class PathFinder {
 		return b;
 	}
 
+	public static boolean getFound(){
+		if(found == true){
+			return true;	
+		}
+
+		else{
+			return false;
+		}
+	}
+
 
 	@SuppressWarnings("rawtypes")
-	public static String find_path(Graph jpx) {
+	public static String find_loop_path(SubGraph jpx, Integer forcediterations) {
 		try {
 			fin = new String();
-
 		//	FileWriter outFile = new FileWriter("./temp");
 		//	PrintWriter out = new PrintWriter(outFile);
 
-			final PathFinder model = new PathFinder();							/* Path		Path */
+			final PathFinderwLoop model = new PathFinderwLoop();							/* Path		Path */
 			final Solver solver = new Solver();
-
 			final Formula f = model.empty();
 		//	System.out.println(f);
 			solver.options().setSolver(SATFactory.DefaultSAT4J);
+			//System.out.println(System.currentTimeMillis());
 
 
-			assert jpx.getNumNodes() > 0;
-			for(int i = 1; i <= jpx.getNumNodes() - 1; i ++){
-			//	out.println("Finding paths for Bounds == " + i);
-				final Bounds b = model.buildpathGraph(jpx, i);
+			Integer i = 1;
+			while(!found){
+				System.out.println("in the while loop in evil pathfinderwloop");
+				
+
+
+
+				final Bounds b = model.buildloopGraph(jpx, i);
 				Iterator iterSols = solver.solveAll(f , b);
-				while(iterSols.hasNext()){
-					Solution s = (Solution)iterSols.next();
+				while(iterSols.hasNext()) {
+					final Solution s = (Solution) iterSols.next();
 					if(s.outcome() == Solution.Outcome.SATISFIABLE || s.outcome() == Solution.Outcome.TRIVIALLY_SATISFIABLE){
-						// this line prints to console
-						//System.out.println(s);
-					
-						// this line writes to file.
-						//	out.print(s);
+					//	System.out.print(s);
+
+
 						String[] temp  = s.toString().split("ref=");
+					//	System.out.println("");
+					//	System.out.println("");
 						temp = temp[1].split(", next=");
 						temp = temp[0].split(", ");
 						ArrayList<String> ee = new ArrayList<String>();
@@ -245,9 +280,10 @@ public class PathFinder {
 						}
 
 						//finally we solve the bloody path.
-						StringBuffer pathtemp = new StringBuffer();
 
-						pathtemp.append("(" + jpx.getStartPt() + ",");
+						
+						StringBuffer pathtemp = new StringBuffer();
+						pathtemp.append("(");
 						for(int x = 0; x < ee.size(); x++){
 							Integer index = en.indexOf(ee.get(x)) + 1;
 							pathtemp.append( en.get(index));
@@ -259,29 +295,70 @@ public class PathFinder {
 							}
 
 						}
-
-
-
-						if(!fin.contains(pathtemp.toString().trim()) &&  ee.size() != 0 ){
-						fin = fin.concat( pathtemp.toString() );
-						}
 						
+						if(fin.toString().trim().contains(jpx.getStartPt())){
+							
+							found =true;
+							break;
+						}
+						if(!fin.contains(pathtemp.toString().trim())){
+							fin = fin.concat( pathtemp.toString() );
+							}
+
+
+
+
+						
+						
+						
+
+
+
+
+
+
+
+					//	out.print(s);	
 					}
 				}
 
+
+				i++;
 			}
-			//outFile.close();
-		//	out.close();
+			found = false; // necessarry for static variable.
+			
+			
+			System.out.println("Determining Fin...");
+			System.out.println("fin = " + fin);
+			String lolz = jpx.StartPt;
+			String morelulz = fin.substring(1);
+			
+			fin = "(" + jpx.StartPt + "|[" +fin.substring(1) + "])";
+			
+			System.out.println("Fin has been determined...");
+			
 		//	System.out.println("path == " + fin);
+		//	out.close();
+		//	outFile.close();
+			
+			
+			
+			
 			return fin;
 
-		}	catch (NumberFormatException nfe) {System.out.print("EEEK1!");}
-		return null;
+		}	catch (NumberFormatException nfe) {}
+		return null; // TODO some protection should be added here
 	}
 
+
+
 	public static void main(String[] argc){
-		Graph jpx = new Graph();
-		jpx.readFile("src/graphs/complexgraph.txt");
-		PathFinder.find_path(jpx);
+		SubGraph jpx = new SubGraph("Loop1");
+		jpx.readFile("src/graphs/forloop.txt");
+		PathFinderwLoop.find_loop_path(jpx, 2);
+
+
 	}
+
+
 }

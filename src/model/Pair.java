@@ -1,4 +1,4 @@
-package pck;
+package model;
 /**
  * Pair class for setting/retrieving/managing a tuple of arity 2 of type string.
  * @author Cory M. Lee

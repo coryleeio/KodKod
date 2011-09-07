@@ -1,4 +1,4 @@
-package pck;
+package model;
 /*
  * 
  * This is the loop finder. it is supposed to find start and end-loop points in a graph.

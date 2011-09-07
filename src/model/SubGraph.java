@@ -1,4 +1,4 @@
-package pck;
+package model;
 
 import java.util.ArrayList;
 
