@@ -10,7 +10,7 @@ public class FileSelectorView {
 	static JFileChooser chooser;
   public FileSelectorView() {
 	     chooser = new JFileChooser();
-	    chooser.setCurrentDirectory(new File("./src"));
+	    chooser.setCurrentDirectory(new File("./src/graphs"));
 	    chooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
   }
 

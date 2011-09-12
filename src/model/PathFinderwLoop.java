@@ -214,6 +214,10 @@ public class PathFinderwLoop {
 			fin = new String();
 		//	FileWriter outFile = new FileWriter("./temp");
 		//	PrintWriter out = new PrintWriter(outFile);
+			
+			
+			String rememberme = jpx.getEndPt();
+			jpx.setEndPt(jpx.getEnd_loop());
 
 			final PathFinderwLoop model = new PathFinderwLoop();							/* Path		Path */
 			final Solver solver = new Solver();
@@ -223,8 +227,9 @@ public class PathFinderwLoop {
 			//System.out.println(System.currentTimeMillis());
 
 
-			Integer i = 1;
-			while(!found){
+		
+			for(int i = 1; i < jpx.getNumNodes(); i++){
+				
 				System.out.println("in the while loop in evil pathfinderwloop");
 				
 
@@ -233,7 +238,15 @@ public class PathFinderwLoop {
 				final Bounds b = model.buildloopGraph(jpx, i);
 				Iterator iterSols = solver.solveAll(f , b);
 				while(iterSols.hasNext()) {
+					
+					// now we iterate through the solutions generated for our graph.....
+					// finding only those that are deemed to be satisfiable.
+					
+					
 					final Solution s = (Solution) iterSols.next();
+					
+					
+				
 					if(s.outcome() == Solution.Outcome.SATISFIABLE || s.outcome() == Solution.Outcome.TRIVIALLY_SATISFIABLE){
 					//	System.out.print(s);
 
@@ -291,17 +304,15 @@ public class PathFinderwLoop {
 								pathtemp.append(",");
 							}
 							else{
+								pathtemp.append(","	);
+								pathtemp.append(jpx.getStartPt());
+								pathtemp.append("," + rememberme);
 								pathtemp.append(")");
 							}
 
 						}
 						
-						if(fin.toString().trim().contains(jpx.getStartPt())){
-							
-							found =true;
-							break;
-						}
-						if(!fin.contains(pathtemp.toString().trim())){
+						if(!fin.contains(pathtemp.toString().trim()) && pathtemp.toString().split(jpx.getStartPt()).length <= 2){
 							fin = fin.concat( pathtemp.toString() );
 							}
 
@@ -323,7 +334,7 @@ public class PathFinderwLoop {
 				}
 
 
-				i++;
+			
 			}
 			found = false; // necessarry for static variable.
 			
@@ -342,7 +353,7 @@ public class PathFinderwLoop {
 		//	outFile.close();
 			
 			
-			
+			jpx.setEndPt(rememberme);
 			
 			return fin;
 
@@ -354,8 +365,11 @@ public class PathFinderwLoop {
 
 	public static void main(String[] argc){
 		SubGraph jpx = new SubGraph("Loop1");
-		jpx.readFile("src/graphs/forloop.txt");
-		PathFinderwLoop.find_loop_path(jpx, 2);
+		jpx.readFile("src/graphs/singleloopwif.txt");
+		// note that the readfile function doesn't set the endloop variable... so this has to be done if you intend on calling the pathfinderwloop manually...
+		// generally the endloop is set by the graph class when the subgraph is created. readFile. is intended for use with graphs only, not subgraphs.  So this is a work around for testing purposes.
+		jpx.setEnd_loop("Node5");
+		PathFinderwLoop.find_loop_path(jpx, 1);
 
 
 	}

@@ -405,7 +405,9 @@ public class Graph {
 		for(int i = 0; i < subs.size(); i++){
 			System.out.println("Attempting to solve subgraph " + i);
 			subs.get(i).solveSubgraph(iterations);
+			
 		}
+		System.out.println("made it through that derpage...");
 	}
 
 	/**
@@ -760,7 +762,7 @@ CheckEdges.clear();
 	//	test2.readFile("src/graphs/parallelloops.txt");
 		Graph test3 = new Graph();
 		Graph test4 = new Graph();
-		test.readFile("src/graphs/parallelloops.txt");
+		test.readFile("src/graphs/singleloopwif.txt");
 		System.out.println("Starting with the following graph...");
 		test.printMe();
 		test.solveGraph(1);

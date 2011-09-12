@@ -104,7 +104,8 @@ public class PathFinder {
 	/* this is the old bounds function that was provided. */ 
 	public final Bounds buildpathGraph(Graph jpx, Integer bound) {
 
-
+System.out.println("in buildpathgraph.....");
+jpx.printMe();
 
 		Integer scope = jpx.getnumVisits();
 		assert scope > 0;
@@ -193,7 +194,7 @@ public class PathFinder {
 
 
 			assert jpx.getNumNodes() > 0;
-			for(int i = 1; i <= jpx.getNumNodes() - 1; i ++){
+			for(int i = 1; i <= jpx.getNumNodes() -1; i ++){
 			//	out.println("Finding paths for Bounds == " + i);
 				final Bounds b = model.buildpathGraph(jpx, i);
 				Iterator iterSols = solver.solveAll(f , b);
@@ -281,7 +282,7 @@ public class PathFinder {
 
 	public static void main(String[] argc){
 		Graph jpx = new Graph();
-		jpx.readFile("src/graphs/complexgraph.txt");
+		jpx.readFile("src/graphs/singleloopwif.txt");
 		PathFinder.find_path(jpx);
 	}
 }
