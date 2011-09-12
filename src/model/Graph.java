@@ -765,7 +765,7 @@ CheckEdges.clear();
 		test.readFile("src/graphs/singleloopwif.txt");
 		System.out.println("Starting with the following graph...");
 		test.printMe();
-		test.solveGraph(1);
+		//test.solveGraph(1);
 		System.out.println("finally done with solve graph... solution is = ");
 		System.out.println( test.getPath()  );
 
