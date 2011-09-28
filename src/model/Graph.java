@@ -440,6 +440,7 @@ System.out.println("CALLING DR. SOLVER");
 		// this is intended to only be run on graphs that DO NOT CONTAIN LOOPS. Otherwise, it will take a long time to complete.
 		this.setPath(PathFinder.find_path(this));
 		for(int i = 0; i < subs.size(); i++){
+		System.out.println("replacing " + subs.get(i).getLabel() + "with " + subs.get(i).getPath());
 		this.setPath( this.getPath().replaceAll(subs.get(i).getLabel(), subs.get(i).getPath()) );
 		}
 		
@@ -725,8 +726,205 @@ CheckEdges.clear();
 		else{
 			// here we deal with multiple outer loops in the same graph.
 			System.out.println("We've decided at this point there is MORE THAN ONE loop in the graph.");
+			ArrayList<ArrayList<String>> twodmatrix = new ArrayList<ArrayList<String>>();
+			ArrayList<String> temparray = new ArrayList<String>();
+			ArrayList<String> loopset = new ArrayList<String>();
 			
-		}
+			
+			
+			String tempy = new String();
+			tempy = inp.split("corresp=")[1].split(" begin=")[0];
+			tempy = tempy.substring(1, tempy.length() - 2);
+			System.out.println(tempy);
+			for(int  i = 0; i < tempy.split("]").length; i++){
+				if( i == 0 ){
+					temparray.add(tempy.split("]")[0].substring(1));
+				}
+				else{
+					temparray.add(tempy.split("]")[i].substring(3, tempy.split("]")[i].length()));
+				}
+				
+			}
+			
+			for(int i = 0; i < temparray.size(); i++){
+				System.out.println( temparray.get(i) );
+			}
+			
+			
+			
+			
+			
+			//instantiate matrix...
+			for(int k = 0; k < temparray.size(); k++){
+				
+					twodmatrix.add(new ArrayList<String>()	);	
+			}
+			
+			
+			
+			for(int i = 0; i < temparray.size(); i ++){
+				for(int k = 0; k < temparray.get(i).split(", ").length; k++){
+					twodmatrix.get(i).add( temparray.get(i).split(", ")[k]);
+				}
+			}
+			
+			for(int i = 0; i < twodmatrix.size(); i++){
+				System.out.println("Printing matrix" + i);
+				for(int k = 0; k < twodmatrix.get(i).size(); k++){
+					System.out.println( twodmatrix.get(i).get(k) );
+				}	
+			}
+			
+			// at this point, matrix contains a set of arrays, each array in the matrix set contains a startpoint endpoint pair.. the next step is to figure out the loop-set.... AND how many elements are in the loop set.
+			
+			
+			
+			tempy = inp.split("loop_set=")[1].split("corresp=")[0].substring(1);
+			tempy = tempy.substring(0, tempy.length() - 3);
+			
+			System.out.println("tempy = " + tempy);
+			
+			
+			for(int i = 0; i < tempy.split("], ").length; i ++ ){
+				
+				if(i == tempy.split("], ").length - 1){
+					loopset.add( tempy.split("], ")[i].substring(1, tempy.split("], ")[i].length() - 1) );
+				}
+				else{
+				loopset.add( tempy.split("], ")[i].substring(1) );
+				}
+			}
+			
+			for(int i = 0; i < loopset.size(); i++){
+				System.out.println( loopset.get(i) );	
+			}
+			
+			
+			// loopset now contains all the elements that are in the loopset.
+			// now if the number of elements in the loopset = the sum of all the sizes of the matrix. there are no elements to be found.. and we can begin processing, otherwise. you must
+			// find which  nodes are not included in the loopset, and add them.
+			// its worth noting, that at the moment, in the columns of our matrix, the first entry is a start node, and the second entry is a end-node.
+			
+			
+			
+			int sum = 0;
+			for(int i = 0; i < twodmatrix.size(); i++){
+				sum = sum + twodmatrix.get(i).size();
+			}
+			
+			if(sum != loopset.size()){
+				System.out.println("It doesn't match, we're going to need to locate more nodes and add them to the twodmatrix");
+				//TODO see sysout above
+			}
+				
+			
+			System.out.println("the number of items in the nodest equals the number of elements in the matrix... we're moving onto processing now....");
+			// the first step here is to find the 'nodeafter' ... thats the node that comse after the start node, that is NOT within the loopset... by definition, one exists, if you have a startnode... but we have to find it.
+				
+			for(int k = 0; k < twodmatrix.size(); k++){
+			
+				
+					for(int i = 0; i < begin.size(); i++){
+						if(begin.get(i).getY().equalsIgnoreCase(twodmatrix.get(k).get(0).trim())){
+							if(!loopset.contains(end.get(i).getY())){
+								System.out.println("Adding " + end.get(i).getY() + " as nodeaf");
+									twodmatrix.get(k).add(end.get(i).getY());
+						}
+					}
+				}
+			}
+			
+			
+			// okay now the 2dmatrix colums contain the following: 
+			// 1st entry is the start node
+			// 2nd entry is the end node
+			// LAST entry is the nodeafter.
+			
+			
+			// next step is to find all the edges that need to be moved over into a subgraph.
+			
+			for(int k = 0; k < twodmatrix.size(); k++){
+				// now we're going to start incrementing through the columns of our matrix and removing edges that correspond to nodes in the matrix, and moving them to subgraphs
+				// we're also going to start removing things from *this* graph.
+				
+				
+				ArrayList<Integer> EdgeInts = new ArrayList<Integer>();
+				ArrayList<String>  EdgeList = new ArrayList<String>();
+				ArrayList<Pair> Begset = new ArrayList<Pair>();
+				ArrayList<Pair> Endset = new ArrayList<Pair>();
+				
+				subs.add(new SubGraph("Loop" + (k+ 1) ));
+				 // collecting the indexes of the begin / end pairs we're going to add to our subgraph....
+				for(int i = 0; i < begin.size(); i++){
+					if(twodmatrix.get(k).contains(begin.get(i).getY())){
+						if(twodmatrix.get(k).contains(end.get(i).getY())){
+							System.out.println("added index " + i );
+							Begset.add(begin.get(i));
+							Endset.add(end.get(i));
+							EdgeInts.add(i);
+							EdgeList.add(begin.get(i).getX());
+						}
+						
+					}
+				}
+				System.out.println("printin dat suckah");
+				this.printMe();
+				
+				
+				// to fill out the graph.. we need a set of nodes.. set of edge names, start point, end point, end loop point, set of begins, set of ends.
+					subs.get(k).setStartPt(twodmatrix.get(k).get(0));
+					subs.get(k).setEndPt(twodmatrix.get(k).get(twodmatrix.get(k).size() - 1));
+					subs.get(k).setEnd_loop(twodmatrix.get(k).get(1));
+					subs.get(k).setNodes(twodmatrix.get(k));
+					subs.get(k).setEdge(EdgeList);
+					subs.get(k).setBegin(Begset);
+					subs.get(k).setEnd(Endset);
+				// the subgraph is now set up.. but we need to remove the appropriate things from *THIS* graph.	
+					this.getNodes().removeAll(twodmatrix.get(k));
+					this.getEdge().removeAll(EdgeList);
+					this.getBegin().removeAll(Begset);
+					this.getEnd().removeAll(Endset);
+					
+
+			// we're still not done. we need to create the new nodes for this graph.
+				this.getNodes().add(subs.get(k).getLabel());
+			
+			
+			for(int i = 0; i < end.size(); i++){
+				if(this.getEnd().get(i).getY().equalsIgnoreCase(twodmatrix.get(k).get(0))){
+					this.getEnd().set(i, new Pair(this.getEnd().get(i).getX(), subs.get(k).getLabel()));
+				}
+				if(this.getBegin().get(i).getY().equalsIgnoreCase(twodmatrix.get(k).get(twodmatrix.get(k).size() - 1))){
+					this.getBegin().set(i, new Pair(this.getBegin().get(i).getX(), subs.get(k).getLabel()));
+				}
+				
+				
+			}
+			
+			
+			
+			
+			
+			
+			} // we're done going through the columns of our matrix now.
+			
+			System.out.println("It's all been removed... heres the contents of this graph.");
+			this.printMe();
+			System.out.println("contents of sub(0) == ");
+			subs.get(0).printMe();
+			System.out.println("contents of sub(1) == ");
+			subs.get(1).printMe();
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		}// big else
 		
 		
 		
@@ -757,17 +955,19 @@ CheckEdges.clear();
 	 */
 	public static void main(String[] argc){
 	    SubGraph test  = new SubGraph("Loop1");
+	    test.readFile("src/graphs/parallelloops.txt");
+	    test.printMe();
 	    
 		//Graph test2 = new Graph();
 	//	test2.readFile("src/graphs/parallelloops.txt");
-		Graph test3 = new Graph();
-		Graph test4 = new Graph();
-		test.readFile("src/graphs/singleloopwif.txt");
-		System.out.println("Starting with the following graph...");
-		test.printMe();
+	//	Graph test3 = new Graph();
+	//	Graph test4 = new Graph();
+	//	test.readFile("src/graphs/singleloopwif.txt");
+	//	System.out.println("Starting with the following graph...");
+	//	test.printMe();
 		//test.solveGraph(1);
-		System.out.println("finally done with solve graph... solution is = ");
-		System.out.println( test.getPath()  );
+	//	System.out.println("finally done with solve graph... solution is = ");
+	//	System.out.println( test.getPath()  );
 
 	//	test2.printMe();
 		//test3.readFile("src/graphs/linearinput.txt");

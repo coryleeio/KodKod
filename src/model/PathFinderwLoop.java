@@ -296,7 +296,7 @@ public class PathFinderwLoop {
 
 						
 						StringBuffer pathtemp = new StringBuffer();
-						pathtemp.append("(");
+						pathtemp.append("(" + jpx.getStartPt() + ",");
 						for(int x = 0; x < ee.size(); x++){
 							Integer index = en.indexOf(ee.get(x)) + 1;
 							pathtemp.append( en.get(index));
@@ -304,13 +304,12 @@ public class PathFinderwLoop {
 								pathtemp.append(",");
 							}
 							else{
-								pathtemp.append(","	);
-								pathtemp.append(jpx.getStartPt());
-								pathtemp.append("," + rememberme);
+								
 								pathtemp.append(")");
 							}
 
 						}
+						
 						
 						if(!fin.contains(pathtemp.toString().trim()) && pathtemp.toString().split(jpx.getStartPt()).length <= 2){
 							fin = fin.concat( pathtemp.toString() );
@@ -340,11 +339,12 @@ public class PathFinderwLoop {
 			
 			
 			System.out.println("Determining Fin...");
-			System.out.println("fin = " + fin);
-			String lolz = jpx.StartPt;
-			String morelulz = fin.substring(1);
 			
-			fin = "(" + jpx.StartPt + "|[" +fin.substring(1) + "])";
+			int index = fin.toString().indexOf(",");
+			
+			
+			fin = "(" + "[" + fin.substring(index + 1) + "]" + rememberme+  ")";
+			System.out.println("fin = " + fin);
 			
 			System.out.println("Fin has been determined...");
 			

@@ -96,6 +96,7 @@ public class SubGraph extends Graph{
 			System.out.println("No path found, check your input");
 		}
 		else{
+			System.out.println("pathfound in solvepathwloop");
 		System.out.println("path found == " + this.getPath());
 		}
 		
